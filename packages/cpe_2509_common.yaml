@@ -1,7 +1,7 @@
 pkgs:
   - "craype-2.7.35"
   - "cpe-defaults-25.09"
-  - "lmod_scripts-3.2.1"
+  - "lmod_scripts-3.2.1.0"
   - "cray-lmod"
   - "cray-modules-3.2.11.7"
   - "cray-pmi-6.1.16"
