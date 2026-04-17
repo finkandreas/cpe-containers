@@ -20,6 +20,8 @@ build {{cfg.name}}:
   variables:
     DOCKERFILE: Dockerfile.rendered
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/public/{{cfg.architecture}}/{{cfg.cpe_version}}/cpe-{{cfg.prgenv}}:$CI_COMMIT_SHORT_SHA
+    KUBERNETES_MEMORY_REQUEST: {% if cfg.architecture == "zen2" %}64Gi{% else %}128Gi{% endif %}
+    KUBERNETES_MEMORY_LIMIT: {% if cfg.architecture == "zen2" %}64Gi{% else %}128Gi{% endif %}
 
 test {{cfg.name}}:
   extends: .baremetal-runner-{% if cfg.architecture == "gh200" %}daint-gh200{% else %}eiger-zen2{% endif %}
