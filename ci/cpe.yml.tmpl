@@ -39,6 +39,7 @@ test {{cfg.name}}:
     CPE_CE: $CSCS_REGISTRY_PATH/public/{{cfg.architecture}}/{{cfg.cpe_version}}/cpe-{{cfg.prgenv}}:$CI_COMMIT_SHORT_SHA
     RFM_AUTODETECT_METHODS: "cat /etc/xthostname,hostname"
     SLURM_TIMELIMIT: '02:00:00'
+    PYTHONUSERBASE: /dev/shm/$(id -un)/python
   artifacts:
     when: always
     paths:
