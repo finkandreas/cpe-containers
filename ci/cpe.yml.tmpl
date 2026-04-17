@@ -20,6 +20,9 @@ build {{cfg.name}}:
   variables:
     DOCKERFILE: Dockerfile.rendered
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/public/{{cfg.architecture}}/{{cfg.cpe_version}}/cpe-{{cfg.prgenv}}:$CI_COMMIT_SHORT_SHA
+    KUBERNETES_MEMORY_REQUEST: {% if cfg.architecture == "zen2" %}64Gi{% else %}128Gi{% endif %}
+    KUBERNETES_MEMORY_LIMIT: {% if cfg.architecture == "zen2" %}64Gi{% else %}128Gi{% endif %}
+    CSCS_BUILD_CACHE: $CSCS_REGISTRY_PATH/build_cache
 
 test {{cfg.name}}:
   extends: .baremetal-runner-{% if cfg.architecture == "gh200" %}daint-gh200{% else %}eiger-zen2{% endif %}
@@ -31,12 +34,14 @@ test {{cfg.name}}:
     - git clone https://github.com/eth-cscs/cscs-reframe-tests.git
     - git clone https://github.com/reframe-hpc/reframe.git
     - cd reframe
-    - ./bootstrap.sh
-    - ./bin/reframe -C ../cscs-reframe-tests/config/cscs.py -r --prefix=$SCRATCH/gitlab-runner/reframe-testing/rfm-$CI_JOB_ID --report-junit=report.xml --mode=cpe_ce_production {% if cfg.architecture == "zen2" %}--system=eiger{% endif %}
+    - ./bootstrap.sh -P $PYTHON_BIN
+    - $PYTHON_BIN ./bin/reframe -C ../cscs-reframe-tests/config/cscs.py -r --prefix=$SCRATCH/gitlab-runner/reframe-testing/rfm-$CI_JOB_ID --report-junit=report.xml --mode=cpe_ce_production {% if cfg.architecture == "zen2" %}--system=eiger{% endif %}
   variables:
     CPE_CE: $CSCS_REGISTRY_PATH/public/{{cfg.architecture}}/{{cfg.cpe_version}}/cpe-{{cfg.prgenv}}:$CI_COMMIT_SHORT_SHA
     RFM_AUTODETECT_METHODS: "cat /etc/xthostname,hostname"
     SLURM_TIMELIMIT: '02:00:00'
+    PYTHONUSERBASE: /dev/shm/$(id -un)/python
+    PYTHON_BIN: /usr/bin/python3.11
   artifacts:
     when: always
     paths:
